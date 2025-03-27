@@ -1,4 +1,4 @@
-FROM php:7.4 AS build
+FROM php:8.1 AS build
 
 ############################################################################
 # Install system commands and libraries
@@ -44,7 +44,7 @@ COPY ./.docker/php.production.dockerfiles/configs/php.ini /usr/local/etc/php/php
 ############################################################################
 # copy the code into the container
 ############################################################################
-COPY ./app /var/www
+COPY ./www /var/www
 
 
 ############################################################################
@@ -67,7 +67,7 @@ RUN rm -rf /var/www/vendor/composer \
 
 
 
-FROM php:7.4-apache AS production
+FROM php:8.1-apache AS production
 
 ############################################################################
 # Install Internationalization
