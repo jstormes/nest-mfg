@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mariadb
--- Generation Time: Mar 27, 2025 at 06:05 PM
+-- Generation Time: Mar 27, 2025 at 06:57 PM
 -- Server version: 11.6.2-MariaDB-ubu2404
 -- PHP Version: 8.2.27
 
@@ -33,8 +33,40 @@ CREATE TABLE IF NOT EXISTS `Job` (
   `JobId` bigint(20) NOT NULL AUTO_INCREMENT,
   `Name` varchar(50) NOT NULL,
   `FirstJobStepId` bigint(20) NOT NULL,
+  `JobStatus` int(11) NOT NULL,
   PRIMARY KEY (`JobId`),
-  KEY `JobStepIdFK` (`FirstJobStepId`)
+  KEY `JobStepIdFK` (`FirstJobStepId`),
+  KEY `JobStatusFK` (`JobStatus`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Job-Template`
+--
+
+CREATE TABLE IF NOT EXISTS `Job-Template` (
+  `TemplateId` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(50) NOT NULL,
+  `Version` int(11) NOT NULL,
+  `FirstJobStepId` bigint(20) NOT NULL,
+  PRIMARY KEY (`TemplateId`),
+  KEY `FirstStepFK` (`FirstJobStepId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `JobNote`
+--
+
+CREATE TABLE IF NOT EXISTS `JobNote` (
+  `JobNoteId` bigint(20) NOT NULL AUTO_INCREMENT,
+  `JobId` bigint(20) NOT NULL,
+  `NoteTitle` varchar(25) NOT NULL,
+  `Note` text NOT NULL,
+  PRIMARY KEY (`JobNoteId`),
+  KEY `JobNoteJobIdFK` (`JobId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- --------------------------------------------------------
@@ -45,21 +77,21 @@ CREATE TABLE IF NOT EXISTS `Job` (
 
 CREATE TABLE IF NOT EXISTS `JobStatus` (
   `JobStatusId` int(11) NOT NULL AUTO_INCREMENT,
-  `Status` varchar(15) NOT NULL,
+  `Name` varchar(25) NOT NULL,
+  `ConcludedStatus` tinyint(1) NOT NULL DEFAULT 0,
   `Color` varchar(6) DEFAULT NULL,
   PRIMARY KEY (`JobStatusId`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --
 -- Dumping data for table `JobStatus`
 --
 
-INSERT INTO `JobStatus` (`JobStatusId`, `Status`, `Color`) VALUES
-(1, 'Not Started', NULL),
-(2, 'Started', NULL),
-(3, 'Paused', NULL),
-(4, 'Problem', NULL),
-(5, 'Finished', NULL);
+INSERT INTO `JobStatus` (`JobStatusId`, `Name`, `ConcludedStatus`, `Color`) VALUES
+(1, 'Waiting', 0, 'F0E68C'),
+(2, 'In Progress', 0, '7CFC00'),
+(3, 'Canceled', 1, '4B0082'),
+(4, 'Completed', 1, '006400');
 
 -- --------------------------------------------------------
 
@@ -132,17 +164,27 @@ CREATE TABLE IF NOT EXISTS `JobStepRelationship` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `JobTemplate`
+-- Table structure for table `JobStepStatus`
 --
 
-CREATE TABLE IF NOT EXISTS `JobTemplate` (
-  `TemplateId` bigint(20) NOT NULL AUTO_INCREMENT,
-  `Name` varchar(50) NOT NULL,
-  `Version` int(11) NOT NULL,
-  `FirstJobStepId` bigint(20) NOT NULL,
-  PRIMARY KEY (`TemplateId`),
-  KEY `FirstStepFK` (`FirstJobStepId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+CREATE TABLE IF NOT EXISTS `JobStepStatus` (
+  `JobStatusId` int(11) NOT NULL AUTO_INCREMENT,
+  `Status` varchar(15) NOT NULL,
+  `Color` varchar(6) DEFAULT NULL,
+  PRIMARY KEY (`JobStatusId`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+--
+-- Dumping data for table `JobStepStatus`
+--
+
+INSERT INTO `JobStepStatus` (`JobStatusId`, `Status`, `Color`) VALUES
+(1, 'Not Started', 'F0E68C'),
+(2, 'Started', '90EE90'),
+(3, 'Paused', 'FAFAD2'),
+(4, 'Problem', 'DC143C'),
+(5, 'Finished', '7FFF00'),
+(6, 'Canceled', 'DC143C');
 
 --
 -- Constraints for dumped tables
@@ -152,13 +194,26 @@ CREATE TABLE IF NOT EXISTS `JobTemplate` (
 -- Constraints for table `Job`
 --
 ALTER TABLE `Job`
+  ADD CONSTRAINT `JobStatusFK` FOREIGN KEY (`JobStatus`) REFERENCES `JobStatus` (`JobStatusId`),
   ADD CONSTRAINT `JobStepIdFK` FOREIGN KEY (`FirstJobStepId`) REFERENCES `JobStep` (`JobStepId`);
+
+--
+-- Constraints for table `Job-Template`
+--
+ALTER TABLE `Job-Template`
+  ADD CONSTRAINT `FirstStepFK` FOREIGN KEY (`FirstJobStepId`) REFERENCES `JobStep` (`JobStepId`);
+
+--
+-- Constraints for table `JobNote`
+--
+ALTER TABLE `JobNote`
+  ADD CONSTRAINT `JobNoteJobIdFK` FOREIGN KEY (`JobId`) REFERENCES `Job` (`JobId`);
 
 --
 -- Constraints for table `JobStep`
 --
 ALTER TABLE `JobStep`
-  ADD CONSTRAINT `StatusFK` FOREIGN KEY (`Status`) REFERENCES `JobStatus` (`JobStatusId`);
+  ADD CONSTRAINT `StatusFK` FOREIGN KEY (`Status`) REFERENCES `JobStepStatus` (`JobStatusId`);
 
 --
 -- Constraints for table `JobStepCost`
@@ -173,12 +228,6 @@ ALTER TABLE `JobStepCost`
 ALTER TABLE `JobStepRelationship`
   ADD CONSTRAINT `ChildFK` FOREIGN KEY (`ChildJobStepId`) REFERENCES `JobStep` (`JobStepId`),
   ADD CONSTRAINT `ParentFK` FOREIGN KEY (`ParrentJobStepId`) REFERENCES `JobStep` (`JobStepId`);
-
---
--- Constraints for table `JobTemplate`
---
-ALTER TABLE `JobTemplate`
-  ADD CONSTRAINT `FirstStepFK` FOREIGN KEY (`FirstJobStepId`) REFERENCES `JobStep` (`JobStepId`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

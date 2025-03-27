@@ -120,7 +120,7 @@ Use the following connection information:
 - Port: `5000`
 - Username: `root`
 - Password: `password`
-- Database: `app`
+- Database: `Jobs`
 
 # Extended Documentation
 
