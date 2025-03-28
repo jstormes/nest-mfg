@@ -12,28 +12,46 @@ You should fork or copy from this project and make it your own.
 
 Make sure you have Docker Desktop installed and running.
 
-### Starting the Project
+### Local Development Setup
 
-1. Open a terminal in the project root directory
-2. Run the following command to start all services in detached mode (in the background):
+1. Clone the repository
+2. Copy `.env.example` to `.env` and configure environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+3. Start the development environment:
    ```bash
    docker compose up -d
    ```
-3. Once started, you can access:
+4. Install dependencies:
+   ```bash
+   docker compose exec php-dev composer install
+   ```
+5. Run database migrations:
+   ```bash
+   docker compose exec php-dev php bin/console doctrine:migrations:migrate
+   ```
+6. Access development server at http://localhost:8088
+
+### Local Development Resources
+
+1. Once started, you can access:
    - Development server: http://localhost:8088
    - PhpMyAdmin: http://localhost:7088
    - Production server: http://localhost:9088
    - Database port: 5000
 
-4. To view logs when running in detached mode:
+2. To view logs when running in detached mode:
    ```bash
    docker compose logs -f
    ```
 
-5. To stop the project:
+3. To stop the project:
    ```bash
    docker compose down
    ```
+
+
 
 ### Initializing Composer
 
