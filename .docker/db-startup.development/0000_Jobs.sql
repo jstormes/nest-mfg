@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mariadb
--- Generation Time: Mar 27, 2025 at 06:57 PM
+-- Generation Time: Mar 28, 2025 at 09:49 AM
 -- Server version: 11.6.2-MariaDB-ubu2404
 -- PHP Version: 8.2.27
 
@@ -33,10 +33,8 @@ CREATE TABLE IF NOT EXISTS `Job` (
   `JobId` bigint(20) NOT NULL AUTO_INCREMENT,
   `Name` varchar(50) NOT NULL,
   `FirstJobStepId` bigint(20) NOT NULL,
-  `JobStatus` int(11) NOT NULL,
   PRIMARY KEY (`JobId`),
-  KEY `JobStepIdFK` (`FirstJobStepId`),
-  KEY `JobStatusFK` (`JobStatus`)
+  KEY `JobStepIdFK` (`FirstJobStepId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- --------------------------------------------------------
@@ -72,30 +70,6 @@ CREATE TABLE IF NOT EXISTS `JobNote` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `JobStatus`
---
-
-CREATE TABLE IF NOT EXISTS `JobStatus` (
-  `JobStatusId` int(11) NOT NULL AUTO_INCREMENT,
-  `Name` varchar(25) NOT NULL,
-  `ConcludedStatus` tinyint(1) NOT NULL DEFAULT 0,
-  `Color` varchar(6) DEFAULT NULL,
-  PRIMARY KEY (`JobStatusId`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
---
--- Dumping data for table `JobStatus`
---
-
-INSERT INTO `JobStatus` (`JobStatusId`, `Name`, `ConcludedStatus`, `Color`) VALUES
-(1, 'Waiting', 0, 'F0E68C'),
-(2, 'In Progress', 0, '7CFC00'),
-(3, 'Canceled', 1, '4B0082'),
-(4, 'Completed', 1, '006400');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `JobStep`
 --
 
@@ -104,6 +78,7 @@ CREATE TABLE IF NOT EXISTS `JobStep` (
   `Priority` int(11) NOT NULL,
   `Name` varchar(25) NOT NULL,
   `Status` int(11) DEFAULT NULL,
+  `UpdateStatusFromChildren` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`JobStepId`),
   KEY `StatusFK` (`Status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
@@ -194,7 +169,6 @@ INSERT INTO `JobStepStatus` (`JobStatusId`, `Status`, `Color`) VALUES
 -- Constraints for table `Job`
 --
 ALTER TABLE `Job`
-  ADD CONSTRAINT `JobStatusFK` FOREIGN KEY (`JobStatus`) REFERENCES `JobStatus` (`JobStatusId`),
   ADD CONSTRAINT `JobStepIdFK` FOREIGN KEY (`FirstJobStepId`) REFERENCES `JobStep` (`JobStepId`);
 
 --
