@@ -56,6 +56,20 @@
     },
     "scripts": {
         "start": "php -S localhost:8080 -t public",
-        "test": "phpunit"
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-html coverage",
+        "test:watch": "phpunit --watch",
+        "test:filter": "phpunit --filter",
+        "phpstan": "phpstan analyse",
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "check": [
+            "@test",
+            "@phpstan",
+            "@cs-check"
+        ],
+        "check:fix": [
+            "@cs-fix"
+        ]
     }
 }
