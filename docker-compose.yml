@@ -40,11 +40,10 @@ services:
 
     # This section sets the environment variables inside the Docker container.
     environment:
-      - TZ=America/Chicago # see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-
-      # Database connection string for the application.
-      # See the "mariadb:" section below for the database setup.
-      - MYSQL_DSN=mysql:host=mariadb;dbname=Jobs;port=3306;charset=utf8mb4;collation=utf8mb4_unicode_ci;user=root;password=password
+      - TZ=${TZ}
+      - MYSQL_DSN=${MYSQL_DSN}
+      - XDEBUG_MODE=${XDEBUG_MODE}
+      - XDEBUG_SESSION=${XDEBUG_SESSION}
 
     # The `ports` tells Docker to map port 80 from inside the container to
     # port 8088 outside the container aka port 8088 on the host, aka your laptop.
@@ -134,8 +133,8 @@ services:
 #    image: localhost:5000/yourimage  ## goes to local registry
 #    image: your-dockerid/yourimage  ## goes to your repository on Docker Hub
     environment:
-      - TZ=America/Chicago
-      - MYSQL_DSN=mysql:host=mariadb;dbname=Jobs;port=3306;charset=utf8mb4;collation=utf8mb4_unicode_ci;user=root;password=password
+      - TZ=${TZ}
+      - MYSQL_DSN=${MYSQL_DSN}
     ports:
       - "9088:80"
 
@@ -146,11 +145,11 @@ services:
   mariadb:
     image: mariadb
     environment:
-      - TZ=America/Chicago # see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-      - MYSQL_ROOT_PASSWORD=password
-      - collation-server=utf8mb4_unicode_ci
-      - character-set-server=utf8mb4
-      - MYSQL_DATABASE=Jobs
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - collation-server=${MYSQL_COLLATION}
+      - character-set-server=${MYSQL_CHARSET}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
     ports:
       - "5000:3306"
     volumes:
@@ -158,9 +157,9 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
-      - TZ=America/Chicago
-      - PMA_USER=root
-      - PMA_PASSWORD=password
-      - PMA_HOSTS=mariadb
+      - TZ=${TZ}
+      - PMA_USER=${PMA_USER}
+      - PMA_PASSWORD=${PMA_PASSWORD}
+      - PMA_HOSTS=${PMA_HOSTS}
     ports:
       - "7088:80"
