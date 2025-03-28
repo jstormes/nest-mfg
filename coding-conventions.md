@@ -3,11 +3,49 @@
 This document outlines the coding conventions and standards for our project.
 
 
-## Coding enviornment 
+## Coding Environment 
 - This project uses docker and docker compose.  
 - Don't rebuild docker containers unless asked.  
-- Use only the php-dev container unlessed asked to use the prod container.
+- Use only the php-dev container unless asked to use the prod container.
 - Use php composer only inside the docker php-dev container.
+
+## Development Workflow
+
+### Local Development Setup
+- Clone the repository
+- Copy `.env.example` to `.env` and configure environment variables
+- Start the development environment: `docker compose up -d`
+- Install dependencies: `docker compose exec php-dev composer install`
+- Run database migrations: `docker compose exec php-dev php bin/console doctrine:migrations:migrate`
+- Access development server at http://localhost:8088
+
+### Development Process
+- Create a new feature branch from main
+- Make changes following coding standards
+- Run tests before committing: `docker compose exec php-dev composer test`
+- Commit changes with descriptive messages
+- Push changes to remote repository
+- Create a pull request when ready for review
+
+### Code Quality Checks
+- Run PHPStan for static analysis: `docker compose exec php-dev composer phpstan`
+- Run PHP CS Fixer for code style: `docker compose exec php-dev composer cs-fix`
+- Run PHPUnit tests: `docker compose exec php-dev composer test`
+- Check for security vulnerabilities: `docker compose exec php-dev composer audit`
+
+### Database Changes
+- Create new migrations for schema changes
+- Never modify existing migrations
+- Test migrations on a clean database
+- Include rollback procedures in migrations
+- Document any manual data changes needed
+
+### Deployment Process
+- Tag releases with semantic versioning
+- Update CHANGELOG.md with changes
+- Run all tests in production environment
+- Deploy using approved deployment method
+- Verify deployment in staging environment first
 
 ## General Formatting
 
@@ -25,9 +63,8 @@ This document outlines the coding conventions and standards for our project.
 - Coding Standards: PSR-12
 - Strict Types: Enabled
 
-
 ### Type Safety
-- All functions and methods must declare return types
+- All PHP code (functions, methods, closures, and anonymous functions) must declare return types
 - All parameters must have type declarations
 - All class properties must have type declarations
 - Use union types where appropriate (e.g., `string|int`)
@@ -56,10 +93,10 @@ This document outlines the coding conventions and standards for our project.
 - Engine: InnoDB
 - Character Set: utf8mb4
 - Collation: utf8mb4_unicode_ci
-- Use the database named app
+- Use the database named Jobs
 - All startup SQL script should be in .docker/db-startup.development
-- When chainging database startup scripts just do a docker build with cache
-- Use the MYSQL_DSN enviornment varable from dcoker to setup the database conection
+- When changing database startup scripts just do a docker build with cache
+- Use the MYSQL_DSN environment variable from docker to setup the database connection
 
 ### Query Formatting
 - SQL Keywords: UPPERCASE
@@ -124,17 +161,20 @@ This document outlines the coding conventions and standards for our project.
 
 ## Version Control
 
-### Commit Messages
-- Use present tense
-- Start with a verb
-- Keep first line under 72 characters
-- Provide detailed description when needed
-
 ### Branch Naming
 - feature/feature-name
 - bugfix/bug-description
 - hotfix/issue-description
 - release/version-number
+- The main branch is named "main"
+- Merge/pull request procedure is TBD
+- Currently there are no code review requirements as this is a solo project
+
+### Commit Messages
+- Use present tense
+- Start with a verb
+- Keep first line under 72 characters
+- Provide detailed description when needed
 
 ## Documentation
 
