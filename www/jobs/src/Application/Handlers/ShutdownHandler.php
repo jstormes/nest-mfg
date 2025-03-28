@@ -5,70 +5,108 @@ declare(strict_types=1);
 namespace App\Application\Handlers;
 
 use App\Application\ResponseEmitter\ResponseEmitter;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ServerRequestInterface;
 use Slim\Exception\HttpInternalServerErrorException;
 
 class ShutdownHandler
 {
-    private Request $request;
-
+    private ServerRequestInterface $request;
     private HttpErrorHandler $errorHandler;
-
     private bool $displayErrorDetails;
+    private $errorGetLastFunc;
+    private ResponseEmitter $responseEmitter;
 
     public function __construct(
-        Request $request,
+        ServerRequestInterface $request,
         HttpErrorHandler $errorHandler,
-        bool $displayErrorDetails
+        bool $displayErrorDetails,
+        ?ResponseEmitter $responseEmitter = null
     ) {
         $this->request = $request;
         $this->errorHandler = $errorHandler;
         $this->displayErrorDetails = $displayErrorDetails;
+        $this->errorGetLastFunc = 'error_get_last';
+        $this->responseEmitter = $responseEmitter ?? new ResponseEmitter();
     }
 
-    public function __invoke()
+    public function __invoke(): void
     {
-        $error = error_get_last();
-        if ($error) {
-            $errorFile = $error['file'];
-            $errorLine = $error['line'];
-            $errorMessage = $error['message'];
-            $errorType = $error['type'];
-            $message = 'An error while processing your request. Please try again later.';
+        $error = ($this->errorGetLastFunc)();
 
-            if ($this->displayErrorDetails) {
-                switch ($errorType) {
-                    case E_USER_ERROR:
-                        $message = "FATAL ERROR: {$errorMessage}. ";
-                        $message .= " on line {$errorLine} in file {$errorFile}.";
-                        break;
-
-                    case E_USER_WARNING:
-                        $message = "WARNING: {$errorMessage}";
-                        break;
-
-                    case E_USER_NOTICE:
-                        $message = "NOTICE: {$errorMessage}";
-                        break;
-
-                    default:
-                        $message = "ERROR: {$errorMessage}";
-                        $message .= " on line {$errorLine} in file {$errorFile}.";
-                        break;
-                }
-            }
-
-            $exception = new HttpInternalServerErrorException($this->request, $message);
-            $response = $this->errorHandler->__invoke(
-                $this->request,
-                $exception,
-                $this->displayErrorDetails,
-                false,
-                false,
-            );
-
-            $responseEmitter = new ResponseEmitter();
-            $responseEmitter->emit($response);
+        if (!is_array($error)) {
+            return;
         }
+
+        $message = $this->getErrorMessage($error);
+        $exception = new HttpInternalServerErrorException(
+            $this->request,
+            $message
+        );
+
+        $response = $this->errorHandler->__invoke(
+            $this->request,
+            $exception,
+            $this->displayErrorDetails,
+            false,
+            false,
+        );
+
+        $this->responseEmitter->emit($response);
+    }
+
+    private function getErrorMessage(array $error): string
+    {
+        if (!$this->displayErrorDetails) {
+            return 'An error while processing your request. Please try again later.';
+        }
+
+        $message = $this->getErrorTypeString($error['type']) . ': ' . $error['message'];
+
+        if (isset($error['file'])) {
+            $message .= ' in ' . $error['file'];
+        }
+
+        if (isset($error['line'])) {
+            $message .= ' on line ' . $error['line'];
+        }
+
+        return $message;
+    }
+
+    private function getErrorTypeString(int $type): string
+    {
+        switch ($type) {
+            case E_ERROR:
+            case E_CORE_ERROR:
+            case E_COMPILE_ERROR:
+            case E_PARSE:
+                return 'FATAL ERROR';
+            case E_USER_ERROR:
+            case E_RECOVERABLE_ERROR:
+                return 'ERROR';
+            case E_WARNING:
+            case E_CORE_WARNING:
+            case E_COMPILE_WARNING:
+            case E_USER_WARNING:
+                return 'WARNING';
+            case E_NOTICE:
+            case E_USER_NOTICE:
+                return 'NOTICE';
+            case E_STRICT:
+                return 'STRICT';
+            case E_DEPRECATED:
+            case E_USER_DEPRECATED:
+                return 'DEPRECATED';
+            default:
+                return 'ERROR';
+        }
+    }
+
+    /**
+     * For testing purposes only
+     */
+    public function setErrorGetLastFunc(callable $func): void
+    {
+        $this->errorGetLastFunc = $func;
     }
 }
