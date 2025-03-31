@@ -79,3 +79,4 @@ fabric.properties
 
 .docker/xdebug.info/
 /.env
+/www/vendor/

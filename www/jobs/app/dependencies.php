@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Application\Actions\Home\HomeAction;
 use App\Application\Settings\SettingsInterface;
+use App\Application\View\View;
 use DI\ContainerBuilder;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -25,6 +27,15 @@ return function (ContainerBuilder $containerBuilder) {
             $logger->pushHandler($handler);
 
             return $logger;
+        },
+        View::class => function (ContainerInterface $c) {
+            return new View();
+        },
+        HomeAction::class => function (ContainerInterface $c) {
+            return new HomeAction(
+                $c->get(LoggerInterface::class),
+                $c->get(View::class)
+            );
         },
     ]);
 };
