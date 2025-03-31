@@ -1,0 +1,90 @@
+<?php $this->layout('layout/base', ['title' => 'Home']) ?>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-4">Welcome to Manufacturing Jobs</h1>
+        <p class="lead">Track and manage your manufacturing jobs efficiently.</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-cogs fa-3x text-primary mb-3"></i>
+                <h3 class="card-title"><?= $activeJobs ?></h3>
+                <p class="card-text">Active Jobs</p>
+                <a href="/jobs?status=active" class="btn btn-primary">View Active Jobs</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-clock fa-3x text-warning mb-3"></i>
+                <h3 class="card-title"><?= $pendingJobs ?></h3>
+                <p class="card-text">Pending Jobs</p>
+                <a href="/jobs?status=pending" class="btn btn-warning">View Pending Jobs</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                <h3 class="card-title"><?= $completedJobs ?></h3>
+                <p class="card-text">Completed Jobs</p>
+                <a href="/jobs?status=completed" class="btn btn-success">View Completed Jobs</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Jobs</h5>
+                <a href="/jobs" class="btn btn-primary btn-sm">View All Jobs</a>
+            </div>
+            <div class="card-body">
+                <?php if (!empty($recentJobs)): ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Job ID</th>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($recentJobs as $job): ?>
+                                    <tr>
+                                        <td><?= $this->e($job['id']) ?></td>
+                                        <td><?= $this->e($job['title']) ?></td>
+                                        <td>
+                                            <span class="badge bg-<?= $this->e($job['status_color']) ?>">
+                                                <?= $this->e($job['status']) ?>
+                                            </span>
+                                        </td>
+                                        <td><?= $this->e($job['created_at']) ?></td>
+                                        <td>
+                                            <a href="/jobs/<?= $this->e($job['id']) ?>" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <p class="text-center mb-0">No recent jobs found.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div> 
