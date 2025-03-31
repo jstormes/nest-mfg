@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Application\Actions\Home\HomeAction;
+use App\Application\Actions\Job\JobAction;
 use App\Application\Settings\SettingsInterface;
 use App\Application\View\View;
 use DI\ContainerBuilder;
@@ -33,6 +34,12 @@ return function (ContainerBuilder $containerBuilder) {
         },
         HomeAction::class => function (ContainerInterface $c) {
             return new HomeAction(
+                $c->get(LoggerInterface::class),
+                $c->get(View::class)
+            );
+        },
+        JobAction::class => function (ContainerInterface $c) {
+            return new JobAction(
                 $c->get(LoggerInterface::class),
                 $c->get(View::class)
             );

@@ -1,0 +1,73 @@
+<?php $this->layout('layout/base', ['title' => 'Create New Job']) ?>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-4">Create New Job</h1>
+        <p class="lead">Fill in the details to create a new manufacturing job.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form action="/jobs/create" method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Job Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Initial Status</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="Not Started">Not Started</option>
+                            <option value="Started">Started</option>
+                            <option value="Paused">Paused</option>
+                            <option value="Problem">Problem</option>
+                            <option value="Finished">Finished</option>
+                            <option value="Canceled">Canceled</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create Job
+                        </button>
+                        <a href="/jobs" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Help</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">When creating a new job:</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Provide a clear, descriptive name
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Include all relevant details in the description
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Choose an appropriate initial status
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div> 
